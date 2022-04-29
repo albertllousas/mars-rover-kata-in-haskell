@@ -24,16 +24,19 @@ run :: Rover -> Grid -> String -> Either RoverError Rover
 run rover grid commands = runReaderT (execute rover grid commands) Dependencies { parseCommands = defaultParseCommands }
 
 execute :: Rover -> Grid -> String -> ReaderT Dependencies (Either RoverError) Rover
-execute rover grid unparsedCommands = ReaderT (\deps -> let executeCommands commands = foldr (\c r -> executeCommand r grid c) rover commands
+execute rover grid unparsedCommands = ReaderT (\deps -> let executeCommands commands = foldr (\c r -> executeCommand c r grid) rover commands
                                                             commands = parseCommands deps $ unparsedCommands
                                                         in executeCommands <$> commands)
 
-executeCommand :: Rover -> Grid -> Command -> Rover
-executeCommand stuck@Rover { obstacle = Just _ } _ _ = stuck
-executeCommand rover@Rover { position = Position xy dir} grid TurnLeft = rover { position = Position xy (turnLeft dir) }
-executeCommand rover@Rover { position = Position xy dir} grid TurnRight = rover { position = Position xy (turnRight dir) }
-executeCommand rover@Rover { position = Position (x,y) dir} grid MoveForward = rover { position = Position (x, y + 1) dir }
-executeCommand rover@Rover { position = Position (x,y) dir} grid MoveBackwards = rover { position = Position (x, y - 1) dir }
+executeCommand :: Command -> Rover -> Grid -> Rover
+executeCommand _ stuck@Rover { obstacle = Just _ } _ = stuck
+executeCommand TurnLeft rover@Rover { position = Position xy dir} grid = rover { position = Position xy (turnLeft dir) }
+executeCommand TurnRight rover@Rover { position = Position xy dir} grid = rover { position = Position xy (turnRight dir) }
+executeCommand MoveForward rover@Rover { position = Position (x,y) dir} grid = rover { position = Position (wrap (x, y + 1) grid) dir }
+executeCommand MoveBackwards rover@Rover { position = Position (x,y) dir} grid = rover { position = Position (wrap (x, y -1) grid) dir }
+
+wrap :: (Int, Int) -> Grid -> (Int, Int)
+wrap (x, y) (Grid (z, w)) = (x `mod` z,  y `mod` w)
 
 turnLeft North = West
 turnLeft direction = pred direction

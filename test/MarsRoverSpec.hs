@@ -26,9 +26,16 @@ spec = do
         let rover = Rover.run initialRover grid "f"
         rover `shouldBe` Right (Rover { position = (Position (0,1) North), obstacle = Nothing })
 
-      it "should move forward" $ do
-        let rover = Rover.run initialRover grid "b"
-        rover `shouldBe` Right (Rover { position = (Position (0,-1) North), obstacle = Nothing })
+      it "should move backwards" $ do
+        let rover = Rover.run Rover { position = (Position (4,4) North), obstacle = Nothing } grid "b"
+        rover `shouldBe` Right (Rover { position = (Position (4,3) North), obstacle = Nothing })
+
+    describe "Grid wrap" $ do
+
+      it "should move from one edge of the grid to another when the rover goes over the boundaries of the grid" $ do
+        let roverInTheEdge = Rover { position = (Position (1,4) North), obstacle = Nothing }
+        let rover = Rover.run roverInTheEdge grid "f"
+        rover `shouldBe` Right (Rover { position = (Position (1,0) North), obstacle = Nothing })
 
     describe "Default command parsing" $ do
 
