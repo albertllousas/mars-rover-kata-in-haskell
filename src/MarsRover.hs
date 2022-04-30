@@ -44,11 +44,11 @@ executeCommand MoveBackwards rover grid = case move (position rover) grid (-1) o
 move :: Position -> Grid -> Int -> Either Obstacle Position
 move (Position (x,y) dir) (Grid size obstacles) n =
   case dir of
-    North -> moveTo (x, y + n) North
-    South -> moveTo (x, y - (n)) South
-    East -> moveTo (x + n, y) East
-    West -> moveTo (x - (n), y) West
-  where moveTo newPoint dir  = (\newPoint -> (Position newPoint dir)) <$> checkObstacle (wrap newPoint size) obstacles
+    North -> moveTo (x, y + n)
+    South -> moveTo (x, y - (n))
+    East -> moveTo (x + n, y)
+    West -> moveTo (x - (n), y)
+  where moveTo newPoint = (\newPoint -> (Position newPoint dir)) <$> checkObstacle (wrap newPoint size) obstacles
         checkObstacle point obstacles = if(point `elem` obstacles) then Left point else Right point
         wrap (x, y) (z, w) = (x `mod` z,  y `mod` w)
 
