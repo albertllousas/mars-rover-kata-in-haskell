@@ -42,15 +42,15 @@ executeCommand MoveForward rover grid = case move (position rover) grid 1 of Lef
 executeCommand MoveBackwards rover grid = case move (position rover) grid (-1) of Left o -> rover { obstacle = Just o }; Right p -> rover { position = p }
 
 move :: Position -> Grid -> Int -> Either Obstacle Position
-move (Position (x,y) North) (Grid size obstacles) n = checkObstacle (Position (wrap (x, y + n) size) North) obstacles
-move (Position (x,y) South) (Grid size obstacles) n = checkObstacle (Position (wrap (x, y - (n)) size) South) obstacles
-move (Position (x,y) East) (Grid size obstacles) n = checkObstacle (Position (wrap (x + n, y) size) East) obstacles
-move (Position (x,y) West) (Grid size obstacles) n = checkObstacle (Position (wrap (x - (n), y) size) West) obstacles
-
-checkObstacle (Position point dir) obstacles = if(point `elem` obstacles) then Left point else Right (Position point dir)
-
-wrap :: Point -> Size -> Point
-wrap (x, y) (z, w) = (x `mod` z,  y `mod` w)
+move (Position (x,y) dir) (Grid size obstacles) n =
+  case dir of
+    North -> moveTo (x, y + n) North
+    South -> moveTo (x, y - (n)) South
+    East -> moveTo (x + n, y) East
+    West -> moveTo (x - (n), y) West
+  where moveTo newPoint dir  = (\newPoint -> (Position newPoint dir)) <$> checkObstacle (wrap newPoint size) obstacles
+        checkObstacle point obstacles = if(point `elem` obstacles) then Left point else Right point
+        wrap (x, y) (z, w) = (x `mod` z,  y `mod` w)
 
 turnLeft North = West
 turnLeft direction = pred direction
