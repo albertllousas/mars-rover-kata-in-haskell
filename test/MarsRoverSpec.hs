@@ -46,9 +46,6 @@ spec = do
       let gridWithObstacles = Grid (5,5) [(0,4)]
       let rover = Rover.run initialRover gridWithObstacles "fffffff"
       rover `shouldBe` Right (Rover { position = (Position (0,3) North), obstacle = Just (0, 4) })
-  --
-  --
-  --    // rest of test, dir, wrap, run, exec
 
   describe "Default command parsing" $ do
 
